@@ -1,0 +1,22 @@
+name: Resolver capas musicais
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'
+permissions:
+  contents: write
+jobs:
+  covers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/resolve-covers.cjs
+      - name: Guardar capas confirmadas
+        run: |
+          git config user.name "palanca-cover-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/posts.json
+          if ! git diff --cached --quiet; then git commit -m "Guardar capas de músicas encontradas no catálogo"; git push; fi
