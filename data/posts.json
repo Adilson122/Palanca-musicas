@@ -2254,7 +2254,9 @@
       "download_url": "",
       "published_at": "2026-10-20T00:00:00Z",
       "status": "published",
-      "cover_note": "Capa gráfica editorial criada pelo Palanca Músicas; não representa arte oficial do lançamento."
+      "cover_note": "Capa gráfica editorial criada pelo Palanca Músicas; não representa arte oficial do lançamento.",
+      "official_download_page": "https://burakasomsistema.bandcamp.com/album/from-buraka-to-the-world",
+      "official_download_note": "Compra e download digital oficial no Bandcamp do artista. Não é download gratuito."
     },
     {
       "id": 162,
@@ -2296,7 +2298,9 @@
       "download_url": "",
       "published_at": "2026-10-20T00:00:00Z",
       "status": "published",
-      "cover_note": "Capa gráfica editorial criada pelo Palanca Músicas; não representa arte oficial do lançamento."
+      "cover_note": "Capa gráfica editorial criada pelo Palanca Músicas; não representa arte oficial do lançamento.",
+      "official_download_page": "https://burakasomsistema.bandcamp.com/album/komba",
+      "official_download_note": "Compra e download digital oficial no Bandcamp do artista. Não é download gratuito."
     }
   ]
 }
