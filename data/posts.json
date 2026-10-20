@@ -2316,10 +2316,11 @@
       "genre": "Kizomba",
       "type": "Música",
       "description": "Não Me Toca, de Anselmo Ralph. Lançamento identificado em plataforma musical oficial: https://music.apple.com/us/song/903850560. A disponibilização de ficheiros para download depende de autorização do titular dos direitos.",
-      "cover": "",
+      "cover": "https://i1.sndcdn.com/artworks-000069041626-0xvbim-t1080x1080.jpg",
       "download_url": "",
       "status": "published",
-      "published_at": "2026-10-20T00:00:00Z"
+      "published_at": "2026-10-20T00:00:00Z",
+      "cover_note": "Fotografia de Anselmo Ralph associada à faixa «Não Me Toca» no SoundCloud; não identificada como capa oficial do single."
     },
     {
       "id": 166,
