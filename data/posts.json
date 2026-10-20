@@ -2307,6 +2307,58 @@
       "cover_note": "Imagem da edição identificada no MusicBrainz, quando disponível.",
       "official_download_page": "https://burakasomsistema.bandcamp.com/album/komba",
       "official_download_note": "Compra e download digital oficial no Bandcamp do artista. Não é download gratuito."
+    },
+    {
+      "id": 165,
+      "slug": "anselmo-ralph-nao-me-toca",
+      "title": "Não Me Toca",
+      "artist": "Anselmo Ralph",
+      "genre": "Kizomba",
+      "type": "Música",
+      "description": "Não Me Toca, de Anselmo Ralph. Lançamento identificado em plataforma musical oficial: https://music.apple.com/us/song/903850560. A disponibilização de ficheiros para download depende de autorização do titular dos direitos.",
+      "cover": "",
+      "download_url": "",
+      "status": "published",
+      "published_at": "2026-10-20T00:00:00Z"
+    },
+    {
+      "id": 166,
+      "slug": "c4-pedro-vamos-ficar-por-aqui",
+      "title": "Vamos Ficar por Aqui",
+      "artist": "C4 Pedro",
+      "genre": "Kizomba",
+      "type": "Música",
+      "description": "Vamos Ficar por Aqui, de C4 Pedro. Lançamento identificado em plataforma musical oficial: https://music.apple.com/us/album/vamos-ficar-por-aqui-team-de-sonho-vol-2-single/6774307221. A disponibilização de ficheiros para download depende de autorização do titular dos direitos.",
+      "cover": "",
+      "download_url": "",
+      "status": "published",
+      "published_at": "2026-10-20T00:00:00Z"
+    },
+    {
+      "id": 167,
+      "slug": "c4-pedro-ceu",
+      "title": "Céu",
+      "artist": "C4 Pedro",
+      "genre": "Kizomba",
+      "type": "Música",
+      "description": "Céu, de C4 Pedro. Lançamento identificado em plataforma musical oficial: https://open.spotify.com/track/2AntzUvY8jn20giibNke57. A disponibilização de ficheiros para download depende de autorização do titular dos direitos.",
+      "cover": "",
+      "download_url": "",
+      "status": "published",
+      "published_at": "2026-10-20T00:00:00Z"
+    },
+    {
+      "id": 168,
+      "slug": "c4-pedro-diz-so",
+      "title": "Diz Só",
+      "artist": "C4 Pedro",
+      "genre": "Kizomba",
+      "type": "Música",
+      "description": "Diz Só, de C4 Pedro. Lançamento identificado em plataforma musical oficial: https://open.spotify.com/track/14nXscvTscb2cQMjJnPl4J. A disponibilização de ficheiros para download depende de autorização do titular dos direitos.",
+      "cover": "",
+      "download_url": "",
+      "status": "published",
+      "published_at": "2026-10-20T00:00:00Z"
     }
   ]
 }
