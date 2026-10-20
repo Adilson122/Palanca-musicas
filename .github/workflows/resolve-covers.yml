@@ -1,6 +1,9 @@
 name: Resolver capas musicais
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/resolve-covers.cjs'
   schedule:
     - cron: '0 3 * * 1'
 permissions:
