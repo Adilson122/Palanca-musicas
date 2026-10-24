@@ -11,8 +11,9 @@ const api=base.replace(/\/$/,'')+'/rest/v1/tabtools_lojou_orders';
 const email=String(body.customer?.email||'').trim().toLowerCase();
 const pid=String(body.product?.pid||'');
 const expectedPid=process.env.LOJOU_PRODUCT_PID;
-if(!expectedPid)return res.status(503).json({error:'Product validation not configured'});
-if(pid!==expectedPid)return res.status(200).json({received:true,ignored:true});
+const productName=String(body.product?.name||'').trim().toLowerCase();
+const matchesProduct=expectedPid?pid===expectedPid:productName==='tabtools pro';
+if(!matchesProduct)return res.status(200).json({received:true,ignored:true});
 let verified=false;
 if(type==='order_approved'&&process.env.LOJOU_API_KEY){
  try{
@@ -21,7 +22,8 @@ if(type==='order_approved'&&process.env.LOJOU_API_KEY){
   if(response.ok){
    const json=await response.json(),order=json.data||json.order||json;
    const orderPid=String(order.product?.pid||order.product_details?.pid||'');
-   verified=String(order.status||'').toLowerCase()==='approved'&&String(order.order_number||order.number||'')===number&&orderPid===expectedPid&&String(order.currency||'').toUpperCase()==='MZN'&&Number(order.amount)===100&&String(order.transaction_id||'')===String(body.transaction_id||'')&&String(order.customer?.email||'').toLowerCase()===email;
+   const matchesVerifiedProduct=expectedPid?orderPid===expectedPid:String(order.product?.name||'').trim().toLowerCase()==='tabtools pro';
+   verified=String(order.status||'').toLowerCase()==='approved'&&String(order.order_number||order.number||'')===number&&matchesVerifiedProduct&&String(order.currency||'').toUpperCase()==='MZN'&&Number(order.amount)===100&&String(order.transaction_id||'')===String(body.transaction_id||'')&&String(order.customer?.email||'').toLowerCase()===email;
   }
  }catch(e){/* keep pending; never trust an unverified notification */}
 }
