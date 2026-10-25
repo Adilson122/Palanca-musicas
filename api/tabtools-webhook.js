@@ -23,7 +23,7 @@ if(type==='order_approved'&&process.env.LOJOU_API_KEY){
    const json=await response.json(),order=json.data||json.order||json;
    const orderPid=String(order.product?.pid||order.product_details?.pid||'');
    const matchesVerifiedProduct=expectedPid?orderPid===expectedPid:String(order.product?.name||'').trim().toLowerCase()==='tabtools pro';
-   verified=/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)&&String(order.status||'').toLowerCase()==='approved'&&String(order.order_number||order.number||'')===number&&matchesVerifiedProduct&&String(order.currency||'').toUpperCase()==='MZN'&&Number(order.amount)===100&&String(order.transaction_id||'')===String(body.transaction_id||'')&&String(order.customer?.email||'').toLowerCase()===email;
+   verified=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)&&String(order.status||'').toLowerCase()==='approved'&&String(order.order_number||order.number||'')===number&&matchesVerifiedProduct&&String(order.currency||'').toUpperCase()==='MZN'&&Number(order.amount)===100&&String(order.transaction_id||'')===String(body.transaction_id||'')&&String(order.customer?.email||'').toLowerCase()===email;
   }
  }catch(e){/* keep pending; never trust an unverified notification */}
 }
