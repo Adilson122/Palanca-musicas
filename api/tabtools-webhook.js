@@ -38,7 +38,7 @@ try{
  if(verified&&type==='order_approved'){
   // A code is generated only for a remotely verified purchase. Never return it in webhook response.
   const crypto=require('crypto');
-  const code=crypto.createHmac('sha256',key).update('tabtools-lojou-v1:'+number).digest('hex').slice(0,24).toUpperCase();
+  const code=crypto.createHmac('sha256',process.env.TABTOOLS_LICENSE_SECRET||key).update('tabtools-lojou-v1:'+number).digest('hex').slice(0,24).toUpperCase();
   const codeHash=crypto.createHash('sha256').update(code).digest('hex');
   const existingLicense=await fetch(base.replace(/\\/$/,'')+'/rest/v1/tabtools_licenses?email=eq.'+encodeURIComponent(email)+'&select=expires_at',{headers});
   if(!existingLicense.ok)throw Error('license lookup');
