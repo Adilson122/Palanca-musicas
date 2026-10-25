@@ -35,6 +35,22 @@ try{
  if(rows.length&&rows[0].verification_status==='verified')return res.status(200).json({received:true});
  const saved=await fetch(api+'?on_conflict=order_number',{method:'POST',headers:{...headers,Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(record)});
  if(!saved.ok)throw Error('db write');
+ if(verified&&type==='order_approved'){
+  // A code is generated only for a remotely verified purchase. Never return it in webhook response.
+  const crypto=require('crypto');
+  const code=crypto.createHmac('sha256',key).update('tabtools-lojou-v1:'+number).digest('hex').slice(0,24).toUpperCase();
+  const codeHash=crypto.createHash('sha256').update(code).digest('hex');
+  const expiry=new Date(Date.now()+30*86400000).toISOString();
+  const existingLicense=await fetch(base.replace(/\\/$/,'')+'/rest/v1/tabtools_licenses?email=eq.'+encodeURIComponent(email)+'&select=expires_at',{headers});
+  if(!existingLicense.ok)throw Error('license lookup');
+  const licenses=await existingLicense.json();
+  const prior=licenses[0]?.expires_at;
+  const nextExpiry=new Date(Math.max(Date.now(),prior?Date.parse(prior):0)+30*86400000).toISOString();
+  const licensed=await fetch(base.replace(/\\/$/,'')+'/rest/v1/tabtools_licenses?on_conflict=email',{method:'POST',headers:{...headers,Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({email,activation_code_hash:codeHash,expires_at:nextExpiry,updated_at:new Date().toISOString()})});
+  if(!licensed.ok)throw Error('license write');
+  const marked=await fetch(api+'?order_number=eq.'+encodeURIComponent(number),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({license_expires_at:nextExpiry})});
+  if(!marked.ok)throw Error('order license update');
+ }
  return res.status(200).json({received:true,verified});
 }catch(e){return res.status(503).json({error:'Temporary storage failure'});}
 };
