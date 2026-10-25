@@ -44,7 +44,10 @@ try{
  const saved=await fetch(api+'?on_conflict=order_number',{method:'POST',headers:{...headers,Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(record)});
  if(!saved.ok)throw Error('db write');
  if(revoked){
-  const rev=await fetch(base.replace(/\/$/,'')+'/rest/v1/tabtools_licenses?email=eq.'+encodeURIComponent(email),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({expires_at:new Date(0).toISOString()})});
+  const crypto=require('crypto');
+  const code=crypto.createHmac('sha256',process.env.TABTOOLS_LICENSE_SECRET||key).update('tabtools-lojou-v1:'+number).digest('hex').slice(0,24).toUpperCase();
+  const hash=crypto.createHash('sha256').update(code).digest('hex');
+  const rev=await fetch(base.replace(/\/$/,'')+'/rest/v1/tabtools_licenses?email=eq.'+encodeURIComponent(email)+'&activation_code_hash=eq.'+hash,{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({expires_at:new Date(0).toISOString()})});
   if(!rev.ok)throw Error('revoke failure');
  }
  if(verified&&type==='order_approved'){
