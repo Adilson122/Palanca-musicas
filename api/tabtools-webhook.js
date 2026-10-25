@@ -2,7 +2,7 @@
 module.exports=async function(req,res){
 res.setHeader('Cache-Control','no-store');
 if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
-const body=req.body||{},type=String(body.order_type||''),number=String(body.order_number||'');
+const body=req.body||{};if(typeof body!=='object'||Array.isArray(body)||Buffer.byteLength(JSON.stringify(body),'utf8')>32768)return res.status(413).json({error:'Invalid payload'});const type=String(body.order_type||''),number=String(body.order_number||'');
 if(!['order_approved','order_cancelled','order_refund'].includes(type)||!/^[-_a-zA-Z0-9]{4,64}$/.test(number))return res.status(400).json({error:'Invalid event'});
 const key=process.env.SUPABASE_SERVICE_ROLE_KEY,base=process.env.SUPABASE_URL;
 if(!key||!base)return res.status(503).json({error:'Database not configured'});
