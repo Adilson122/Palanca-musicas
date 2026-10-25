@@ -14,8 +14,8 @@ const expectedPid=process.env.LOJOU_PRODUCT_PID;
 const productName=String(body.product?.name||'').trim().toLowerCase();
 const matchesProduct=expectedPid?pid===expectedPid:productName==='tabtools pro';
 if(!matchesProduct)return res.status(200).json({received:true,ignored:true});
-let verified=false;
-if(type==='order_approved'&&process.env.LOJOU_API_KEY){
+let verified=false,revoked=false,verifiedOrder=null;
+if(process.env.LOJOU_API_KEY){
  try{
   const origin=process.env.LOJOU_API_BASE_URL||'https://api.lojou.app';
   const response=await fetch(origin.replace(/\/$/,'')+'/v1/orders/'+encodeURIComponent(number),{headers:{Authorization:'Bearer '+process.env.LOJOU_API_KEY,Accept:'application/json'},signal:AbortSignal.timeout(6000)});
@@ -23,18 +23,30 @@ if(type==='order_approved'&&process.env.LOJOU_API_KEY){
    const json=await response.json(),order=json.data||json.order||json;
    const orderPid=String(order.product?.pid||order.product_details?.pid||'');
    const matchesVerifiedProduct=expectedPid?orderPid===expectedPid:String(order.product?.name||'').trim().toLowerCase()==='tabtools pro';
-   verified=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)&&String(order.status||'').toLowerCase()==='approved'&&String(order.order_number||order.number||'')===number&&matchesVerifiedProduct&&String(order.currency||'').toUpperCase()==='MZN'&&Number(order.amount)===100&&String(order.transaction_id||'')===String(body.transaction_id||'')&&String(order.customer?.email||'').toLowerCase()===email;
+   const sameOrder=String(order.order_number||order.number||'')===number&&matchesVerifiedProduct&&String(order.currency||'').toUpperCase()==='MZN'&&Number(order.amount)===100&&String(order.transaction_id||'')===String(body.transaction_id||'')&&String(order.customer?.email||'').toLowerCase()===email;
+   const state=String(order.status||'').toLowerCase();
+   verified=sameOrder&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)&&['approved','paid','completed'].includes(state);
+   revoked=sameOrder&&['refunded','refund','cancelled','canceled','chargeback'].includes(state);
+   verifiedOrder=order;
   }
- }catch(e){/* keep pending; never trust an unverified notification */}
+ }catch(e){/* do not trust unverified events */}
 }
+if(type!=='order_approved')verified=false;
+
 const record={order_number:number,transaction_id:String(body.transaction_id||''),event_type:type,verification_status:verified?'verified':'pending',customer_email:email,product_pid:pid,amount_mzn:Number(body.amount)||null,payload:{order_type:type,order_number:number},received_at:new Date().toISOString(),verified_at:verified?new Date().toISOString():null};
 try{
  const existing=await fetch(api+'?order_number=eq.'+encodeURIComponent(number)+'&select=verification_status,license_expires_at',{headers});
  if(!existing.ok)throw Error('db read');
  const rows=await existing.json();
- if(rows.length&&rows[0].verification_status==='verified'&&rows[0].license_expires_at)return res.status(200).json({received:true});
+ if(rows.length&&rows[0].verification_status==='verified'&&rows[0].license_expires_at&&!revoked)return res.status(200).json({received:true});
+ if(type!=='order_approved'&&!revoked)return res.status(202).json({received:true,verified:false});
+ if(revoked){record.verification_status='revoked';record.revoked_at=new Date().toISOString();}
  const saved=await fetch(api+'?on_conflict=order_number',{method:'POST',headers:{...headers,Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(record)});
  if(!saved.ok)throw Error('db write');
+ if(revoked){
+  const rev=await fetch(base.replace(/\/$/,'')+'/rest/v1/tabtools_licenses?email=eq.'+encodeURIComponent(email),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({expires_at:new Date(0).toISOString()})});
+  if(!rev.ok)throw Error('revoke failure');
+ }
  if(verified&&type==='order_approved'){
   // A code is generated only for a remotely verified purchase. Never return it in webhook response.
   const crypto=require('crypto');
