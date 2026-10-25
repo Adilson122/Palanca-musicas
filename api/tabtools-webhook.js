@@ -39,7 +39,9 @@ try{
  if(!existing.ok)throw Error('db read');
  const rows=await existing.json();
  if(rows.length&&rows[0].verification_status==='verified'&&rows[0].license_expires_at&&!revoked)return res.status(200).json({received:true});
+ if(rows.length&&rows[0].verification_status==='revoked')return res.status(200).json({received:true,revoked:true});
  if(type!=='order_approved'&&!revoked)return res.status(202).json({received:true,verified:false});
+ if(type==='order_approved'&&!verified)return res.status(202).json({received:true,verified:false});
  if(revoked){record.verification_status='revoked';record.revoked_at=new Date().toISOString();}
  const saved=await fetch(api+'?on_conflict=order_number',{method:'POST',headers:{...headers,Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(record)});
  if(!saved.ok)throw Error('db write');
