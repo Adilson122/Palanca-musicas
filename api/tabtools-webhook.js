@@ -40,12 +40,12 @@ try{
   const crypto=require('crypto');
   const code=crypto.createHmac('sha256',process.env.TABTOOLS_LICENSE_SECRET||key).update('tabtools-lojou-v1:'+number).digest('hex').slice(0,24).toUpperCase();
   const codeHash=crypto.createHash('sha256').update(code).digest('hex');
-  const existingLicense=await fetch(base.replace(/\\/$/,'')+'/rest/v1/tabtools_licenses?email=eq.'+encodeURIComponent(email)+'&select=expires_at',{headers});
+  const existingLicense=await fetch(base.replace(/\/$/,'')+'/rest/v1/tabtools_licenses?email=eq.'+encodeURIComponent(email)+'&select=expires_at',{headers});
   if(!existingLicense.ok)throw Error('license lookup');
   const licenses=await existingLicense.json();
   const prior=licenses[0]?.expires_at;
   const nextExpiry=new Date(Math.max(Date.now(),prior?Date.parse(prior):0)+30*86400000).toISOString();
-  const licensed=await fetch(base.replace(/\\/$/,'')+'/rest/v1/tabtools_licenses?on_conflict=email',{method:'POST',headers:{...headers,Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({email,activation_code_hash:codeHash,expires_at:nextExpiry,updated_at:new Date().toISOString()})});
+  const licensed=await fetch(base.replace(/\/$/,'')+'/rest/v1/tabtools_licenses?on_conflict=email',{method:'POST',headers:{...headers,Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({email,activation_code_hash:codeHash,expires_at:nextExpiry,updated_at:new Date().toISOString()})});
   if(!licensed.ok)throw Error('license write');
   const marked=await fetch(api+'?order_number=eq.'+encodeURIComponent(number),{method:'PATCH',headers:{...headers,Prefer:'return=minimal'},body:JSON.stringify({license_expires_at:nextExpiry})});
   if(!marked.ok)throw Error('order license update');
